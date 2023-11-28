@@ -32,7 +32,7 @@ namespace Dune_Trainer
             this.invincibleThreads = new Dictionary<IntPtr, Thread>();
             this.vehicleManager = new VehicleManager();
             this.buildingManager = new BuildingManager();
-            this.unitPointer = (IntPtr)0x7B452C;
+            this.unitPointer = (IntPtr)0x7988A0;
 
             label1.Text = "test";
             this.memory = memoryService.GetMemory();
@@ -53,76 +53,44 @@ namespace Dune_Trainer
 
             UpdateTable();
 
-            /*
-            for (int i = 0; i <= 148; i++)
-            {
-                var column = new DataGridViewColumn();
-                column.CellTemplate = new DataGridViewTextBoxCell();
-                dataGridView2.Columns.Add(column);
-            }
-
-            AddVehicleData((IntPtr)0x7E2DBC - 0x94);
-            for (int i = 0; i < 40; i++)
-            {
-                AddVehicleData((IntPtr)0x7E2DBC - 0x94*30 + 0x94 * i);
-            }*/
         }
-
-        /*private void AddVehicleData(IntPtr typePtr)
-        {
-            byte[] vehicleData = this.memory.Read<byte>(typePtr, 148, false);
-            var row = new DataGridViewRow();
-            foreach (var b in vehicleData)
-            {
-                var cell = new DataGridViewTextBoxCell();
-                cell.Value = b;
-                row.Cells.Add(cell);
-            }
-            dataGridView2.Rows.Add(row);
-        }*/
 
         private void UpdateTable()
         {
             dataGridView1.Rows.Clear();
 
-            //IntPtr typePtr = (IntPtr)0x7B452C; // Atreides
-            //IntPtr typePtr = (IntPtr)0x7DAEBC; // Harkonnen
-            //IntPtr typePtr = (IntPtr)0x80184C; // Ordos
-            //IntPtr typePtr = (IntPtr)0x8281DC; // Emperor
             var typePtr = this.unitPointer;
 
             var vehicleTypes = this.vehicleManager.GetTypes();
             var buildingTypes = this.buildingManager.GetTypes();
 
 
-            for (int i = 0; i < 232; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 //typePtr = typePtr + (0x94 * i);
 
-                byte unitFill = this.memory.Read<byte>(typePtr + 0x60 + (0x94 * i), 1, false)[0];
-                byte pointer = this.memory.Read<byte>(typePtr + (0x94 * i), 1, false)[0];
+                byte unitType = this.memory.Read<byte>(typePtr + 0x90 + (0x94 * i), 1, false)[0];
+                IntPtr pointer = typePtr + (0x94 * i);
                 byte type;
-                int health;
-                string typeStr;
-                string unitType = "";
-                string buildingType = "";
+                int health = 0;
+                string unitTypeText = "";
+                string buildingTypeText = "";
 
-                if (unitFill == 0)
+                if (unitType == 2)
                 {
-                    type = this.memory.Read<byte>(typePtr + 0x3C + (0x94 * i), 1, false)[0];
-                    health = this.memory.Read<int>(typePtr + 0x2C + (0x94 * i), 1, false)[0];
-                    typeStr = buildingTypes[type];
-                    buildingType = buildingTypes[type];
-                } else
+                    type = this.memory.Read<byte>(typePtr + 0x34 + (0x94 * i), 1, false)[0];
+                    health = this.memory.Read<int>(typePtr + 0x24 + (0x94 * i), 1, false)[0];
+                    buildingTypeText = buildingTypes[type];
+                } 
+                if (unitType == 1)
                 {
-                    type = this.memory.Read<byte>(typePtr + 0x20 + (0x94 * i), 1, false)[0];
-                    health = this.memory.Read<int>(typePtr + 0xC + (0x94 * i), 1, false)[0];
-                    typeStr = vehicleTypes[type];
-                    unitType = vehicleTypes[type];
+                    type = this.memory.Read<byte>(typePtr + 0x18 + (0x94 * i), 1, false)[0];
+                    health = this.memory.Read<int>(typePtr + 0x4 + (0x94 * i), 1, false)[0];
+                    unitTypeText = vehicleTypes[type];
                 }
-                if(health > 0)
+                if(unitType == 1 || unitType == 2)
                 {
-                    dataGridView1.Rows.Add(pointer, unitType, buildingType, health);
+                    dataGridView1.Rows.Add(pointer, unitTypeText, buildingTypeText, health);
                 }
             }
         }
@@ -149,12 +117,20 @@ namespace Dune_Trainer
 
         private void dataGridView2_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
+            var senderGrid = (DataGridView)sender;
 
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
+                e.RowIndex >= 0)
+            {
+                var pointer = (IntPtr)dataGridView2.SelectedCells[0].OwningRow.Cells[0].Value;
+                invincibleThreads.Remove(pointer);
+                UpdateInvincibleTable();
+            }
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //IntPtr typePtr = (IntPtr)0x7B452C; // Atreides (3rd array, first 0x79889D)
+            //IntPtr typePtr = (IntPtr)0x7B452C; // Atreides (3rd array, first 0x7988A0)
             //IntPtr typePtr = (IntPtr)0x7DAEBC; // Harkonnen
             //IntPtr typePtr = (IntPtr)0x80184C; // Ordos
             //IntPtr typePtr = (IntPtr)0x8281DC; // Emperor
@@ -165,28 +141,28 @@ namespace Dune_Trainer
             switch (comboBox1.SelectedIndex)
             {
                 case 0:
-                    this.unitPointer = (IntPtr)0x7B452C;
+                    this.unitPointer = (IntPtr)0x7988A0;
                     break;
                 case 1:
-                    this.unitPointer = (IntPtr)0x7DAEBC;
+                    this.unitPointer = (IntPtr)0x7BF230;
                     break;
                 case 2:
-                    this.unitPointer = (IntPtr)0x80184C;
+                    this.unitPointer = (IntPtr)0x7E5BC0;
                     break;
                 case 3:
-                    this.unitPointer = (IntPtr)0x8281DC;
+                    this.unitPointer = (IntPtr)0x80C550;
                     break;
                 case 4:
-                    this.unitPointer = (IntPtr)0x84EB6C;
+                    this.unitPointer = (IntPtr)0x832EE0;
                     break;
                 case 5:
-                    this.unitPointer = (IntPtr)0x8754FC;
+                    this.unitPointer = (IntPtr)0x859870;
                     break;
                 case 6:
-                    this.unitPointer = (IntPtr)0x89BE8C;
+                    this.unitPointer = (IntPtr)0x880200;
                     break;
                 case 7:
-                    this.unitPointer = (IntPtr)0x8C281C;
+                    this.unitPointer = (IntPtr)0x8A6B90;
                     break;
             }
             UpdateTable();
@@ -209,36 +185,25 @@ namespace Dune_Trainer
         private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             var dataGridView = sender as DataGridView;
-            var pointer = (byte)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
-
-
-            var typePtr = this.unitPointer;
+            IntPtr pointer = (IntPtr)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
 
             var vehicleTypes = this.vehicleManager.GetTypes();
             var buildingTypes = this.buildingManager.GetTypes();
 
-            byte unitFill = this.memory.Read<byte>(typePtr + 0x60 + (0x94 * pointer), 1, false)[0];
+            byte unitType = this.memory.Read<byte>(pointer + 0x90, 1, false)[0];
             var health = Convert.ToInt32(dataGridView1.SelectedCells[0].OwningRow.Cells[3].Value);
 
-            if (unitFill == 0)
+            if (unitType == 2)
             {
                 var type = buildingTypes.FirstOrDefault(x => x.Value == (string)dataGridView1.SelectedCells[0].OwningRow.Cells[2].Value).Key;
-                this.memory.Write<byte>(typePtr + 0x3C + (0x94 * pointer), type, false);
-                this.memory.Write<int>(typePtr + 0x2C + (0x94 * pointer), health, false);
-                //type = this.memory.Read<byte>(typePtr + 0x3C + (0x94 * pointer), 1, false)[0];
-                //health = this.memory.Read<int>(typePtr + 0x2C + (0x94 * pointer), 1, false)[0];
-                //typeStr = buildingTypes[type];
-                //buildingType = buildingTypes[type];
+                this.memory.Write<byte>(pointer + 0x34, type, false);
+                this.memory.Write<int>(pointer + 0x24, health, false);
             }
-            else
+            if (unitType == 1)
             {
                 var type = vehicleTypes.FirstOrDefault(x => x.Value == (string)dataGridView1.SelectedCells[0].OwningRow.Cells[1].Value).Key;
-                this.memory.Write<byte>(typePtr + 0x20 + (0x94 * pointer), type, false);
-                this.memory.Write<int>(typePtr + 0xC + (0x94 * pointer), health, false);
-                //type = this.memory.Read<byte>(typePtr + 0x20 + (0x94 * pointer), 1, false)[0];
-                //health = this.memory.Read<int>(typePtr + 0xC + (0x94 * pointer), 1, false)[0];
-                //typeStr = vehicleTypes[type];
-                //unitType = vehicleTypes[type];
+                this.memory.Write<byte>(pointer + 0x18, type, false);
+                this.memory.Write<int>(pointer + 0x4, health, false);
             }
             UpdateTable();
         }
@@ -250,33 +215,22 @@ namespace Dune_Trainer
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn &&
                 e.RowIndex >= 0)
             {
-                var pointer = (byte)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
-                var typePtr = this.unitPointer;
-                byte unitFill = this.memory.Read<byte>(typePtr + 0x60 + (0x94 * pointer), 1, false)[0];
+                var pointer = (IntPtr)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
+                byte unitType = this.memory.Read<byte>(pointer + 0x90, 1, false)[0];
                 var health = Convert.ToInt32(dataGridView1.SelectedCells[0].OwningRow.Cells[3].Value);
-                IntPtr healthPointer;
-                if (unitFill == 0)
+                IntPtr healthPointer = pointer;
+                bool isUnitOrBuilding = false;
+                if (unitType == 2)
                 {
-                    //this.memory.Write<byte>(typePtr + 0x3C + (0x94 * pointer), type, false);
-                    //this.memory.Write<int>(typePtr + 0x2C + (0x94 * pointer), health, false);
-                    //type = this.memory.Read<byte>(typePtr + 0x3C + (0x94 * pointer), 1, false)[0];
-                    //health = this.memory.Read<int>(typePtr + 0x2C + (0x94 * pointer), 1, false)[0];
-                    //typeStr = buildingTypes[type];
-                    //buildingType = buildingTypes[type];
-                    healthPointer = typePtr + 0x2C + (0x94 * pointer);
+                    healthPointer = pointer + 0x24;
+                    isUnitOrBuilding = true;
                 }
-                else
+                if (unitType == 1)
                 {
-                    //this.memory.Write<byte>(typePtr + 0x20 + (0x94 * pointer), type, false);
-                    //this.memory.Write<int>(typePtr + 0xC + (0x94 * pointer), health, false);
-                    //type = this.memory.Read<byte>(typePtr + 0x20 + (0x94 * pointer), 1, false)[0];
-                    //health = this.memory.Read<int>(typePtr + 0xC + (0x94 * pointer), 1, false)[0];
-                    //typeStr = vehicleTypes[type];
-                    //unitType = vehicleTypes[type];
-
-                    healthPointer = typePtr + 0xC + (0x94 * pointer);
+                    healthPointer = pointer + 0x4;
+                    isUnitOrBuilding = true;
                 }
-                if(!this.invincibleThreads.ContainsKey(healthPointer))
+                if(isUnitOrBuilding && !this.invincibleThreads.ContainsKey(healthPointer))
                 {
                     var thread = new Thread(() => invincibleThread(healthPointer));
                     invincibleThreads.Add(healthPointer, thread);

@@ -41,7 +41,7 @@ namespace Dune_Trainer
                 dataGridView1.Columns.Add(column);
             }
 
-            for (int i = 0; i < 1500; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 AddVehicleData((IntPtr)0x7988A0 + 0x94 * i);
             }
