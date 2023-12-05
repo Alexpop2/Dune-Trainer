@@ -32,15 +32,16 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.updateTable = new System.Windows.Forms.Button();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.Pointer2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.UnitType2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.DeleteInvincible = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.Pointer = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.UnitType = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.BuildingType = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.Health = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.AddInvincible = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.Copy = new System.Windows.Forms.DataGridViewButtonColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
@@ -67,7 +68,8 @@
             this.UnitType,
             this.BuildingType,
             this.Health,
-            this.AddInvincible});
+            this.AddInvincible,
+            this.Copy});
             this.dataGridView1.Location = new System.Drawing.Point(12, 52);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
@@ -106,24 +108,6 @@
             this.dataGridView2.TabIndex = 5;
             this.dataGridView2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellContentClick);
             // 
-            // comboBox1
-            // 
-            this.comboBox1.Items.AddRange(new object[] {
-            "Atreides",
-            "Harkonnen",
-            "Ordos",
-            "Emperor",
-            "Fremen",
-            "Smugglers",
-            "Mercenaries",
-            "Sandworm"});
-            this.comboBox1.Location = new System.Drawing.Point(13, 13);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 28);
-            this.comboBox1.TabIndex = 6;
-            this.comboBox1.Text = "Atreides";
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            // 
             // Pointer2
             // 
             this.Pointer2.HeaderText = "Pointer";
@@ -146,6 +130,24 @@
             this.DeleteInvincible.MinimumWidth = 8;
             this.DeleteInvincible.Name = "DeleteInvincible";
             this.DeleteInvincible.Width = 150;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.Items.AddRange(new object[] {
+            "Atreides",
+            "Harkonnen",
+            "Ordos",
+            "Emperor",
+            "Fremen",
+            "Smugglers",
+            "Mercenaries",
+            "Sandworm"});
+            this.comboBox1.Location = new System.Drawing.Point(13, 13);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(121, 28);
+            this.comboBox1.TabIndex = 6;
+            this.comboBox1.Text = "Atreides";
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // Pointer
             // 
@@ -185,6 +187,14 @@
             this.AddInvincible.Text = "AddInvincible";
             this.AddInvincible.Width = 150;
             // 
+            // Copy
+            // 
+            this.Copy.HeaderText = "Copy";
+            this.Copy.MinimumWidth = 8;
+            this.Copy.Name = "Copy";
+            this.Copy.ReadOnly = true;
+            this.Copy.Width = 150;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -219,6 +229,7 @@
         private System.Windows.Forms.DataGridViewComboBoxColumn BuildingType;
         private System.Windows.Forms.DataGridViewTextBoxColumn Health;
         private System.Windows.Forms.DataGridViewButtonColumn AddInvincible;
+        private System.Windows.Forms.DataGridViewButtonColumn Copy;
     }
 }
 
