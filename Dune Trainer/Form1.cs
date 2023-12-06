@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -236,10 +237,36 @@ namespace Dune_Trainer
             }
         }
 
-        private void CopyButtonClicked()
+        private IntPtr findNextSlot()
+        {
+            for (int i = 999; i >= 0; i--)
+            {
+                byte unitType = this.memory.Read<byte>(this.unitPointer + 0x94 * i + 0x90, 1, false)[0];
+                if(unitType == 0)
+                {
+                    return this.unitPointer + 0x94 * i;
+                }
+            }
+            return (IntPtr)0x000000;
+        }
+
+        private IntPtr findNextSlotFromPointer(IntPtr pointer)
+        {
+            for (int i = 1; i <= 1000; i++)
+            {
+                byte unitType = this.memory.Read<byte>(pointer - 0x94 * i + 0x90, 1, false)[0];
+                if (unitType == 0)
+                {
+                    return pointer - 0x94 * i;
+                }
+            }
+            return (IntPtr)0x000000;
+        }
+
+        private void copyUnit()
         {
             var pointer = (IntPtr)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
-            byte unitType = this.memory.Read<byte>(pointer + 0x90, 1, false)[0];
+
             byte mapXSize = this.memory.Read<byte>((IntPtr)0x517DE8, 1, false)[0];
             byte mapYSize = this.memory.Read<byte>((IntPtr)0x517DEC, 1, false)[0];
             var nextSlotBytes = this.memory.Read<byte>(this.unitPointer - 0x2C, 3, false);
@@ -251,14 +278,16 @@ namespace Dune_Trainer
             int nextSlotPointerInt = BitConverter.ToInt32(nextSlotBytesTemporary, 0);
             // Create IntPtr from the integer value
             IntPtr nextSlotPointer = new IntPtr(nextSlotPointerInt);
+            //IntPtr nextSlotPointer = findNextSlot();
+            byte[] nextSlotPointerBytes = BitConverter.GetBytes(nextSlotPointer.ToInt32());
 
             byte[] lastSlotBytesTemporary = { lastSlotBytes[0], lastSlotBytes[1], lastSlotBytes[2], 0 };
             // Convert byte[] to integer
             int lastSlotPointerInt = BitConverter.ToInt32(lastSlotBytesTemporary, 0);
             IntPtr lastSlotPointer = new IntPtr(lastSlotPointerInt);
 
-            byte[] previousVehicleData = this.memory.Read<byte>(nextSlotPointer - 0x94 + 0x7C, 3, false);
-            byte[] prePreviousVehicleData = this.memory.Read<byte>(nextSlotPointer - 0x94 * 2 + 0x7C, 3, false);
+            //byte[] previousVehicleData = this.memory.Read<byte>(nextSlotPointer - 0x94 + 0x7C, 3, false);
+            //byte[] prePreviousVehicleData = this.memory.Read<byte>(nextSlotPointer - 0x94 * 2 + 0x7C, 3, false);
 
             for (int key = 0; key < vehicleData.Length; ++key)
             {
@@ -268,6 +297,9 @@ namespace Dune_Trainer
                 }
             }
 
+            IntPtr secondNextSlotPointer = findNextSlotFromPointer(nextSlotPointer);
+            byte[] secondNextSlotPointerBytes = BitConverter.GetBytes(secondNextSlotPointer.ToInt32());
+
             byte positionX = (byte)(vehicleData[72]);
             byte positionY = (byte)(vehicleData[73] + 1);
             byte positionYGrid = 16;
@@ -276,7 +308,8 @@ namespace Dune_Trainer
             if (vehicleData[58] <= 223)
             {
                 positionYGrid = (byte)(vehicleData[58] + 32);
-            } else
+            }
+            else
             {
                 positionYGridCount++;
             }
@@ -292,33 +325,49 @@ namespace Dune_Trainer
             this.memory.Write<byte>(nextSlotPointer + 0x3A + 0xF + 0x2 + 0x2, positionY, false);
             this.memory.Write<byte>(nextSlotPointer + 0x3A + 0xF + 0x2 + 0x2 + 0x4, positionY, false);
 
-            this.memory.Write<byte>(lastSlotPointer + 0x7C, previousVehicleData[0], false);
-            this.memory.Write<byte>(lastSlotPointer + 0x7D, previousVehicleData[1], false);
-            this.memory.Write<byte>(lastSlotPointer + 0x7E, previousVehicleData[2], false);
+            this.memory.Write<byte>(lastSlotPointer + 0x7C, nextSlotPointerBytes[0], false);
+            this.memory.Write<byte>(lastSlotPointer + 0x7D, nextSlotPointerBytes[1], false);
+            this.memory.Write<byte>(lastSlotPointer + 0x7E, nextSlotPointerBytes[2], false);
 
+            this.memory.Write<byte>(nextSlotPointer + 0x7C, 0, false);
+            this.memory.Write<byte>(nextSlotPointer + 0x7D, 0, false);
+            this.memory.Write<byte>(nextSlotPointer + 0x7E, 0, false);
             this.memory.Write<byte>(nextSlotPointer + 0x80, lastSlotBytes[0], false);
             this.memory.Write<byte>(nextSlotPointer + 0x81, lastSlotBytes[1], false);
             this.memory.Write<byte>(nextSlotPointer + 0x82, lastSlotBytes[2], false);
 
-            this.memory.Write<byte>(this.unitPointer - 0x2C, prePreviousVehicleData[0], false);
-            this.memory.Write<byte>(this.unitPointer - 0x2B, prePreviousVehicleData[1], false);
-            this.memory.Write<byte>(this.unitPointer - 0x2A, prePreviousVehicleData[2], false);
+            this.memory.Write<byte>(this.unitPointer - 0x2C, secondNextSlotPointerBytes[0], false);
+            this.memory.Write<byte>(this.unitPointer - 0x2B, secondNextSlotPointerBytes[1], false);
+            this.memory.Write<byte>(this.unitPointer - 0x2A, secondNextSlotPointerBytes[2], false);
 
-            this.memory.Write<byte>(this.unitPointer + 0x26080, previousVehicleData[0], false);
-            this.memory.Write<byte>(this.unitPointer + 0x26081, previousVehicleData[1], false);
-            this.memory.Write<byte>(this.unitPointer + 0x26082, previousVehicleData[2], false);
+            this.memory.Write<byte>(this.unitPointer + 0x26080, nextSlotPointerBytes[0], false);
+            this.memory.Write<byte>(this.unitPointer + 0x26081, nextSlotPointerBytes[1], false);
+            this.memory.Write<byte>(this.unitPointer + 0x26082, nextSlotPointerBytes[2], false);
 
-            this.memory.Write<byte>(this.unitPointer - 0x24, previousVehicleData[0], false);
-            this.memory.Write<byte>(this.unitPointer - 0x23, previousVehicleData[1], false);
-            this.memory.Write<byte>(this.unitPointer - 0x22, previousVehicleData[2], false);
+            this.memory.Write<byte>(this.unitPointer - 0x24, nextSlotPointerBytes[0], false);
+            this.memory.Write<byte>(this.unitPointer - 0x23, nextSlotPointerBytes[1], false);
+            this.memory.Write<byte>(this.unitPointer - 0x22, nextSlotPointerBytes[2], false);
 
-            this.memory.Write<byte>(nextSlotPointer - 0x94 + 0x7C, 0, false);
-            this.memory.Write<byte>(nextSlotPointer - 0x94 + 0x7D, 0, false);
-            this.memory.Write<byte>(nextSlotPointer - 0x94 + 0x7E, 0, false);
+            this.memory.Write<byte>(secondNextSlotPointer + 0x7C, 0, false);
+            this.memory.Write<byte>(secondNextSlotPointer + 0x7D, 0, false);
+            this.memory.Write<byte>(secondNextSlotPointer + 0x7E, 0, false);
 
-            this.memory.Write<byte>(mapAddress, 8, false); // Write to map
+
+            byte[] unitMapType = BitConverter.GetBytes(8 + comboBox1.SelectedIndex);
+
+            this.memory.Write<byte>(mapAddress, unitMapType[0], false); // Write to map
 
             UpdateTable();
+        }
+
+        private void CopyButtonClicked()
+        {
+            var pointer = (IntPtr)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
+            byte unitType = this.memory.Read<byte>(pointer + 0x90, 1, false)[0];
+            if(unitType == 1)
+            {
+                copyUnit();
+            }
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
