@@ -43,6 +43,7 @@
             this.AddInvincible = new System.Windows.Forms.DataGridViewButtonColumn();
             this.Copy = new System.Windows.Forms.DataGridViewButtonColumn();
             this.Move = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.CreateConcrete = new System.Windows.Forms.DataGridViewButtonColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.SuspendLayout();
@@ -71,7 +72,8 @@
             this.Health,
             this.AddInvincible,
             this.Copy,
-            this.Move});
+            this.Move,
+            this.CreateConcrete});
             this.dataGridView1.Location = new System.Drawing.Point(12, 52);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
@@ -208,6 +210,14 @@
             this.Move.Name = "Move";
             this.Move.Width = 150;
             // 
+            // CreateConcrete
+            // 
+            this.CreateConcrete.HeaderText = "CreateConcrete";
+            this.CreateConcrete.MinimumWidth = 8;
+            this.CreateConcrete.Name = "CreateConcrete";
+            this.CreateConcrete.ReadOnly = true;
+            this.CreateConcrete.Width = 150;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -244,6 +254,7 @@
         private System.Windows.Forms.DataGridViewButtonColumn AddInvincible;
         private System.Windows.Forms.DataGridViewButtonColumn Copy;
         private System.Windows.Forms.DataGridViewComboBoxColumn Move;
+        private System.Windows.Forms.DataGridViewButtonColumn CreateConcrete;
     }
 }
 

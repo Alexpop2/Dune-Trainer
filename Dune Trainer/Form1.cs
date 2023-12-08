@@ -502,6 +502,25 @@ namespace Dune_Trainer
             }
         }
 
+        private void CreateConcreteButtonClicked()
+        {
+            var pointer = (IntPtr)dataGridView1.SelectedCells[0].OwningRow.Cells[0].Value;
+
+            byte positionX = this.memory.Read<byte>(pointer + 0x3A + 0xE, 1, false)[0];
+            byte positionY = this.memory.Read<byte>(pointer + 0x3A + 0xF, 1, false)[0];
+
+            byte mapXSize = this.memory.Read<byte>((IntPtr)0x517DE8, 1, false)[0];
+            IntPtr terrainTypeAddress = (IntPtr)0x517DF0 + (0xC * positionX) + (0xC * (positionY * mapXSize));
+            IntPtr buildingTypeAddress = (IntPtr)0x517DF5 + (0xC * positionX) + (0xC * (positionY * mapXSize));
+            IntPtr houseIdAddress = (IntPtr)0x517DF6 + (0xC * positionX) + (0xC * (positionY * mapXSize));
+            byte houseType = BitConverter.GetBytes(comboBox1.SelectedIndex * 2)[0];
+
+            this.memory.Write<byte>(terrainTypeAddress, 159, false);
+            this.memory.Write<byte>(buildingTypeAddress, 232, false);
+            this.memory.Write<byte>(houseIdAddress, houseType, false);
+
+        }
+
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
@@ -516,6 +535,9 @@ namespace Dune_Trainer
                         break;
                     case 5:
                         CopyButtonClicked();
+                        break;
+                    case 7:
+                        CreateConcreteButtonClicked();
                         break;
                 }
             }
