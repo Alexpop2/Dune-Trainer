@@ -516,6 +516,9 @@ namespace Dune_Trainer
             byte houseType = BitConverter.GetBytes(comboBox1.SelectedIndex * 2)[0];
 
             this.memory.Write<byte>(terrainTypeAddress, 159, false);
+            this.memory.Write<byte>(terrainTypeAddress + 0x1, 2, false);
+            this.memory.Write<byte>(terrainTypeAddress + 0x2, 62, false);
+            this.memory.Write<byte>(terrainTypeAddress + 0x3, 2, false);
             this.memory.Write<byte>(buildingTypeAddress, 232, false);
             this.memory.Write<byte>(houseIdAddress, houseType, false);
 
